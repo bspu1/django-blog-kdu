@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .models import Post
 from django.http import Http404
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .forms import CommentForm
 
 
 def post_list(request):
@@ -50,4 +51,19 @@ def post_detail(request, year, month, day, post):
         publish__month=month,
         publish__day=day,
     )
-    return render(request, "blog/post/detail.html", {"post": post})
+    comments = post.comments.all()
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+            return redirect(request.path_info)
+    else:
+        comment_form = CommentForm()
+
+    return render(
+        request,
+        "blog/post/detail.html",
+        {"post": post, "comments": comments, "comment_form": comment_form},
+    )

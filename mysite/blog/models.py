@@ -40,10 +40,24 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    # def get_absolute_url(self):
-    # return reverse("blog:post_detail", args=[self.id])
     def get_absolute_url(self):
         return reverse(
             "blog:post_detail",
             args=[self.publish.year, self.publish.month, self.publish.day, self.slug],
         )
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    name = models.CharField(max_length=50)
+    body = models.TextField()
+    create_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+        indexes = [
+            models.Index(fields=["-create_at"]),
+        ]
+
+    def __str__(self):
+        return self.body[:100]

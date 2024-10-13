@@ -6,4 +6,19 @@
   <h1>{{ post.title }}</h1>
   <p class="date">Published {{ post.publish }} by {{ post.author }}</p>
   {{ post.body|linebreaks }}
-{% endblock %}
+
+  <h3>Додати коментар</h3>
+  <form method="post">
+    {% csrf_token %}
+    {{ comment_form.as_p }}
+    <button type="submit">Додати коментар</button>
+  </form>
+
+  <h3>Коментарі</h3>
+  {% for comment in comments %}
+    <h4>{{ comment.name }}</h4>
+    <p class="date">Published {{ comment.create_at }}</p>
+    {{ comment.body }}
+  {% endfor %}
+
+  {% endblock %}
